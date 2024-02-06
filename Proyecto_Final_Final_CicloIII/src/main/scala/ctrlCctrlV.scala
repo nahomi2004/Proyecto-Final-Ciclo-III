@@ -33,6 +33,10 @@ object ctrlCctrlV {
     val contentFile: List[Map[String, String]] =
       reader.allWithHeaders()
 
+    val ruta2 = "C:/Users/D E L L/Documents/Nahomi/CICLO III/PFR/ArchivoPIntegrador/dsPartidosYGoles.csv"
+    val reader2 = CSVReader.open(new File(ruta2))
+    val contentFile2: List[Map[String, String]] =
+      reader2.allWithHeaders()
 
     def valoresDoBuedos(valor: String) =
       if (valor == "not available" || valor == "not applicable" || valor == "NA" || valor == "\\s") {
@@ -81,8 +85,25 @@ object ctrlCctrlV {
 
       //value.foreach(println)
 
+    def generateDataTourments (data: List[Map[String, String]]) =
+      // ? -> indicar parámetros de sustitución.
+
+      val value = data
+        .map(x => (valoresDoBuedos(x("tournaments_year")).toInt, x("tournaments_tournament_name"), x("tournaments_host_country"), x("tournaments_winner"), valoresDoBuedos(x("tournaments_count_teams")).toInt))
+        .sortBy(_._1)
+        .map(x =>
+          sql"""
+            |INSERT INTO tournaments(tournaments_year, tournaments_tournament_name, tournaments_host_country, tournaments_winner, tournaments_count_teams)
+            |VALUES($x._1, $x._2, $x._3, $x._4, $x._5);
+            |"""
+            .stripMargin
+            .update
+            .run)
+
+
 
     // llamar a los métodos
-    generateDataSquadsTable(contentFile)
-    generateDataPlayersTable(contentFile)
+    // generateDataSquadsTable(contentFile)
+    // generateDataPlayersTable(contentFile)
+    generateDataTourments(contentFile2)
 }
