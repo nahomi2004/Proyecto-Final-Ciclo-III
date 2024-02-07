@@ -1,5 +1,7 @@
 // import para el archivo
 import com.github.tototoshi.csv.*
+import doobie.util.transactor
+
 import java.io.File
 
 // escribir los datos en un txt
@@ -10,6 +12,7 @@ import doobie.implicits._
 
 import cats._
 import cats.effect._
+import cats.effect.unsafe.IORuntime
 import cats.effect.unsafe.implicits.global
 import cats.implicits._
 
@@ -45,6 +48,13 @@ object ctrlCctrlV {
         valor.toDouble
       }
 
+    def comillasRaras(valor: String) =
+      val newValor = valor.replace("'", "\\'")
+      newValor
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // DATOS PARA EL SCRIPT
+
     def escribirDatosTXT (nombreTXT: String, archivo: String): Unit =
       val rutaTXT = "C:/Users/D E L L/Documents/Nahomi/CICLO III/PROYECTO FINAL FINAL FINAL/"
       val rutaFinal = rutaTXT + nombreTXT
@@ -57,53 +67,84 @@ object ctrlCctrlV {
         escritor.close()
       }
 
-    def generateDataSquadsTable(data: List[Map[String, String]]): Unit = // en esta función crearemos los insert into o lo que sea necesario para poblar la tabla Genre
+    def generateDataSquadsTableTXT(data: List[Map[String, String]]): Unit = // en esta función crearemos los insert into o lo que sea necesario para poblar la tabla Genre
       val nombreTXT = "squads.txt"
       val insertFormat = s"INSERT INTO squads(squads_player_id, squads_tournament_id, squads_team_id, squads_shirt_number, squads_position_name) VALUES('%s', '%s', '%s', %d, '%s');"
       val value = data
-        .map(x => (x("squads_player_id"), x("squads_tournament_id"), x("squads_team_id"), valoresDoBuedos(x("squads_shirt_number")).toInt, x("squads_position_name")))
+        .map(x => (x("squads_player_id"),
+          x("squads_tournament_id"),
+          x("squads_team_id"),
+          valoresDoBuedos(x("squads_shirt_number")).toInt,
+          x("squads_position_name")))
         .sortBy(x => (x._1, x._2))
         .map(x => escribirDatosTXT(nombreTXT, insertFormat.formatLocal(java.util.Locale.US, x._1, x._2, x._3, x._4, x._5)))
 
-      // value.foreach(println)
 
-
-      /*
-      println(data.map(x => x("squads_shirt_number") == "not applicable").
-        filter(_ == true))
-
-      Esto solo era para comprobar si no había ningun valor extraño, nada más
-       */
-
-    def generateDataPlayersTable (data: List[Map[String, String]]): Unit =
+    def generateDataPlayersTableTXT (data: List[Map[String, String]]): Unit =
       val nombreTXT = "players.txt"
       val insertFormat = s"INSERT INTO players(squadsPlayerId, squadsTournamentId, players_given_name, players_family_name, players_birth_date, players_female, players_goal_keepere, players_defender, players_midfielder, players_forward) VALUES('%s', '%s', '%s', '%s', '%s', %d, %d, %d, %d, %d);"
       val value = data
-        .map(x => (x("squads_player_id"), x("squads_tournament_id"), x("players_given_name"), x("players_family_name"), x("players_birth_date"), valoresDoBuedos(x("players_female")).toInt, valoresDoBuedos(x("players_goal_keeper")).toInt, valoresDoBuedos(x("players_defender")).toInt, valoresDoBuedos(x("players_midfielder")).toInt, valoresDoBuedos(x("players_forward")).toInt))
+        .map(x => (x("squads_player_id"),
+          x("squads_tournament_id"),
+          comillasRaras(x("players_given_name")),
+          comillasRaras(x("players_family_name")),
+          comillasRaras(x("players_birth_date")),
+          valoresDoBuedos(x("players_female")).toInt,
+          valoresDoBuedos(x("players_goal_keeper")).toInt,
+          valoresDoBuedos(x("players_defender")).toInt,
+          valoresDoBuedos(x("players_midfielder")).toInt,
+          valoresDoBuedos(x("players_forward")).toInt))
+        .distinct
         .sortBy(x => (x._3, x._5))
         .map(x => escribirDatosTXT(nombreTXT, insertFormat.formatLocal(java.util.Locale.US, x._1, x._2, x._3, x._4, x._5, x._6, x._7, x._8, x._9, x._10)))
 
-      //value.foreach(println)
+    def generateDataTourmentsTXT(data: List[Map[String, String]]) =
+      val nombreTXT = "tournaments.txt"
+      val insertFormat = s"INSERT INTO tournaments(tournaments_year, tournaments_tournament_name, tournaments_host_country, tournaments_winner, tournaments_count_teams) VALUES(%d, '%s', '%s', '%s', %d)"
+      val valores = data
+        .map(x => (valoresDoBuedos(x("tournaments_year").trim).toInt,
+          x("tournaments_tournament_name").trim,
+          x("tournaments_host_country").trim,
+          x("tournaments_winner").trim,
+          valoresDoBuedos(x("tournaments_count_teams").trim).toInt))
+        .distinct
+        .map(x => escribirDatosTXT(nombreTXT, insertFormat.formatLocal(java.util.Locale.US, x._1, x._2, x._3, x._4, x._5)))
 
-    def generateDataTourments (data: List[Map[String, String]]) =
+    def generateDataStadiumTXT(data: List[Map[String, String]]) =
+      0
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // DATOS PARA INSERTAR DIRECTO
+
+    def generateDataTourments(data: List[Map[String, String]]) =
       // ? -> indicar parámetros de sustitución.
+      val valores = data
+        .map(x => (valoresDoBuedos(x("tournaments_year").trim).toInt,
+          x("tournaments_tournament_name").trim,
+          x("tournaments_host_country").trim,
+          x("tournaments_winner").trim,
+          valoresDoBuedos(x("tournaments_count_teams").trim).toInt))
+        .distinct
+        .map(info => sql"INSERT INTO tournaments(tournaments_year, tournaments_tournament_name, tournaments_host_country, tournaments_winner, tournaments_count_teams) VALUES(${info._1}, ${info._2}, ${info._3}, ${info._4}, ${info._5})".update)
 
-      val value = data
-        .map(x => (valoresDoBuedos(x("tournaments_year")).toInt, x("tournaments_tournament_name"), x("tournaments_host_country"), x("tournaments_winner"), valoresDoBuedos(x("tournaments_count_teams")).toInt))
-        .sortBy(_._1)
-        .map(x =>
-          sql"""
-            |INSERT INTO tournaments(tournaments_year, tournaments_tournament_name, tournaments_host_country, tournaments_winner, tournaments_count_teams)
-            |VALUES($x._1, $x._2, $x._3, $x._4, $x._5);
-            |"""
-            .stripMargin
-            .update
-            .run)
+      valores
+
+    /*def insertIntoTourmentData(info: (Int, String, String, String, Int)): IO[Int] =
+      val sentencia = sql"""
+             |USE mundial;
+             |INSERT INTO tournaments(tournaments_year, tournaments_tournament_name, tournaments_host_country, tournaments_winner, tournaments_count_teams)
+             |VALUES(${info._1}, ${info._2}, ${info._3}, ${info._4}, ${info._5});
+             |"""
+      sentencia.update.run.transact(xa)*/
+
+    /*def runInsertsIntos() =
+      generateDataTourments(contentFile2).debug.as(ExitCode.Success)*/
 
 
 
     // llamar a los métodos
-    // generateDataSquadsTable(contentFile)
-    // generateDataPlayersTable(contentFile)
-    generateDataTourments(contentFile2)
+    // generateDataSquadsTableTXT(contentFile)
+    generateDataPlayersTableTXT(contentFile)
+
+    // generateDataTourments(contentFile2).foreach(i => i.run.transact(xa).unsafeRunSync())
 }
