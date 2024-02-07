@@ -1,5 +1,3 @@
-USE mundial;
-
 INSERT INTO players(squadsPlayerId, squadsTournamentId, players_given_name, players_family_name, players_birth_date, players_female, players_goal_keeper, players_defender, players_midfielder, players_forward) VALUES('P-98909', 'WC-1998', 'Aaron', 'Lawrence', '1970-08-11', 0, 1, 0, 0, 0);
 INSERT INTO players(squadsPlayerId, squadsTournamentId, players_given_name, players_family_name, players_birth_date, players_female, players_goal_keeper, players_defender, players_midfielder, players_forward) VALUES('P-65611', 'WC-2010', 'Aaron', 'Mokoena', '1980-11-25', 0, 0, 1, 0, 0);
 INSERT INTO players(squadsPlayerId, squadsTournamentId, players_given_name, players_family_name, players_birth_date, players_female, players_goal_keeper, players_defender, players_midfielder, players_forward) VALUES('P-65611', 'WC-2002', 'Aaron', 'Mokoena', '1980-11-25', 0, 0, 1, 0, 0);
