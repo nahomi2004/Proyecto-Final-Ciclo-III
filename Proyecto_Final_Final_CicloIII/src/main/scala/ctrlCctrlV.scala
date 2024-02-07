@@ -70,13 +70,13 @@ object ctrlCctrlV {
     def generateDataSquadsTableTXT(data: List[Map[String, String]]): Unit = // en esta función crearemos los insert into o lo que sea necesario para poblar la tabla Genre
       val nombreTXT = "squads.txt"
       val insertFormat = s"INSERT INTO squads(squads_player_id, squads_tournament_id, squads_team_id, " +
-        s"squads_shirt_number, squads_position_name) VALUES('%s', '%s', '%s', %d, '%s');"
+          s"squads_shirt_number, squads_position_name) VALUES('%s', '%s', '%s', %d, '%s');"
       val value = data
-        .map(x => (x("squads_player_id"),
-          x("squads_tournament_id"),
-          x("squads_team_id"),
-          valoresDoBuedos(x("squads_shirt_number")).toInt,
-          x("squads_position_name")))
+        .map(x => (x("squads_player_id").trim,
+          x("squads_tournament_id").trim,
+          x("squads_team_id").trim,
+          valoresDoBuedos(x("squads_shirt_number").trim).toInt,
+          x("squads_position_name").trim))
         .sortBy(x => (x._1, x._2))
         .map(x => escribirDatosTXT(nombreTXT, insertFormat.formatLocal(java.util.Locale.US,
           x._1, x._2, x._3, x._4, x._5)))
@@ -88,16 +88,16 @@ object ctrlCctrlV {
         s"players_family_name, players_birth_date, players_female, players_goal_keeper, players_defender, " +
         s"players_midfielder, players_forward) VALUES('%s', '%s', '%s', '%s', '%s', %d, %d, %d, %d, %d);"
       val value = data
-        .map(x => (x("squads_player_id"),
-          x("squads_tournament_id"),
-          comillasRaras(x("players_given_name")),
-          comillasRaras(x("players_family_name")),
-          comillasRaras(x("players_birth_date")),
-          valoresDoBuedos(x("players_female")).toInt,
-          valoresDoBuedos(x("players_goal_keeper")).toInt,
-          valoresDoBuedos(x("players_defender")).toInt,
-          valoresDoBuedos(x("players_midfielder")).toInt,
-          valoresDoBuedos(x("players_forward")).toInt))
+        .map(x => (x("squads_player_id").trim,
+          x("squads_tournament_id").trim,
+          comillasRaras(x("players_given_name").trim),
+          comillasRaras(x("players_family_name").trim),
+          comillasRaras(x("players_birth_date").trim),
+          valoresDoBuedos(x("players_female").trim).toInt,
+          valoresDoBuedos(x("players_goal_keeper").trim).toInt,
+          valoresDoBuedos(x("players_defender").trim).toInt,
+          valoresDoBuedos(x("players_midfielder").trim).toInt,
+          valoresDoBuedos(x("players_forward").trim).toInt))
         .distinct
         .sortBy(x => (x._3, x._5))
         .map(x => escribirDatosTXT(nombreTXT, insertFormat.formatLocal(java.util.Locale.US,
@@ -122,9 +122,9 @@ object ctrlCctrlV {
       val insertFormat = s"INSERT INTO stadiums(stadiums_stadium_name, stadiums_city_name, stadiums_country_name, " +
         s"stadiums_stadium_capacity) VALUES('%s', '%s', '%s', %d);"
       val valores = data
-        .map(x => (comillasRaras(x("stadiums_stadium_name")),
-          comillasRaras(x("stadiums_city_name")),
-          comillasRaras(x("stadiums_country_name")),
+        .map(x => (comillasRaras(x("stadiums_stadium_name").trim),
+          comillasRaras(x("stadiums_city_name").trim),
+          comillasRaras(x("stadiums_country_name").trim),
           valoresDoBuedos(x("stadiums_stadium_capacity")).toInt
         ))
         .distinct
@@ -141,23 +141,23 @@ object ctrlCctrlV {
         s"'%s', '%s', %d, %d, %d, %d, %d, %d, '%s');"
 
       val valores = data
-        .map(x => (valoresDoBuedos(x("tournaments_year")).toInt,
-          comillasRaras(x("stadiums_stadium_name")),
-          comillasRaras(x("matches_tournament_id")),
-          comillasRaras(x("matches_match_id")),
-          comillasRaras(x("matches_away_team_id")),
-          comillasRaras(x("matches_home_team_id")),
-          comillasRaras(x("matches_stadium_id")),
-          comillasRaras(x("matches_match_date")),
-          comillasRaras(x("matches_match_time")),
-          comillasRaras(x("matches_stage_name")),
-          valoresDoBuedos(x("matches_home_team_score")).toInt,
-          valoresDoBuedos(x("matches_away_team_score")).toInt,
-          valoresDoBuedos(x("matches_extra_time")).toInt,
-          valoresDoBuedos(x("matches_penalty_shootout")).toInt,
-          valoresDoBuedos(x("matches_home_team_score_penalties")).toInt,
-          valoresDoBuedos(x("matches_away_team_score_penalties")).toInt,
-          comillasRaras(x("matches_result"))
+        .map(x => (valoresDoBuedos(x("tournaments_year").trim).toInt,
+          comillasRaras(x("stadiums_stadium_name".trim)),
+          comillasRaras(x("matches_tournament_id").trim),
+          comillasRaras(x("matches_match_id").trim),
+          comillasRaras(x("matches_away_team_id").trim),
+          comillasRaras(x("matches_home_team_id").trim),
+          comillasRaras(x("matches_stadium_id").trim),
+          comillasRaras(x("matches_match_date").trim),
+          comillasRaras(x("matches_match_time").trim),
+          comillasRaras(x("matches_stage_name").trim),
+          valoresDoBuedos(x("matches_home_team_score").trim).toInt,
+          valoresDoBuedos(x("matches_away_team_score").trim).toInt,
+          valoresDoBuedos(x("matches_extra_time").trim).toInt,
+          valoresDoBuedos(x("matches_penalty_shootout").trim).toInt,
+          valoresDoBuedos(x("matches_home_team_score_penalties").trim).toInt,
+          valoresDoBuedos(x("matches_away_team_score_penalties").trim).toInt,
+          comillasRaras(x("matches_result").trim)
         ))
         .distinct
         .map(x => escribirDatosTXT(nombreTXT, insertFormat.formatLocal(java.util.Locale.US,
@@ -172,7 +172,7 @@ object ctrlCctrlV {
       listaJugadoresPorEquipo
 
 
-    def generateDataTeamsTableTXT(data: List[Map[String, String]], dataSP: List[Map[String, String]]): Unit =
+    def generateDataTeamsTableTXT(data: List[Map[String, String]]): Unit =
       val nombreTXT = "teams.txt"
 
       val insertFormat = s"INSERT INTO teams(squadsTournamentId, home_team_name, " +
@@ -192,6 +192,36 @@ object ctrlCctrlV {
         .sortBy(x => (x._3, x._5))
         .map(x => escribirDatosTXT(nombreTXT, insertFormat.formatLocal(java.util.Locale.US,
           x._1, x._2, x._3, x._4, x._5, x._6, x._7, x._8, x._9)))
+
+    def generateDataGoalsTableTXT(data: List[Map[String, String]]): Unit =
+      val nombreTXT = "goals.txt"
+
+      val insertFormat = s"INSERT INTO goals(squadsTournamentIdG, matchesMatchId, " +
+        s"homeTeamName, awayTeamName, tournamentsYear, goals_goal_id, goals_team_id, " +
+        s"goals_player_id, goals_player_team_id, goals_minute_label, goals_minute_regulation, " +
+        s"goals_minute_stoppage, goals_match_period, goals_own_goal, goals_penalty) VALUES('%s', '%s', '%s', '%s', " +
+        s"%d, '%s', '%s', '%s', '%s', '%s', %d, %d, '%s', %d, %d);"
+      val value = data
+        .map(x => (x("matches_tournament_id").trim,
+          x("matches_match_id").trim,
+          comillasRaras(x("home_team_name").trim),
+          comillasRaras(x("away_team_name").trim),
+          valoresDoBuedos(x("tournaments_year").trim).toInt,
+          comillasRaras(x("goals_goal_id").trim),
+          comillasRaras(x("goals_team_id").trim),
+          comillasRaras(x("goals_player_id").trim),
+          comillasRaras(x("goals_player_team_id").trim),
+          comillasRaras(x("goals_minute_label").trim),
+          valoresDoBuedos(x("goals_minute_regulation").trim).toInt,
+          valoresDoBuedos(x("goals_minute_stoppage").trim).toInt,
+          comillasRaras(x("goals_match_period").trim),
+          valoresDoBuedos(x("goals_own_goal").trim).toInt,
+          valoresDoBuedos(x("goals_penalty").trim).toInt
+        ))
+        .distinct
+        .sortBy(x => (x._3, x._5))
+        .map(x => escribirDatosTXT(nombreTXT, insertFormat.formatLocal(java.util.Locale.US,
+          x._1, x._2, x._3, x._4, x._5, x._6, x._7, x._8, x._9, x._10, x._11, x._12, x._13, x._14, x._15)))
 
     // -----------------------------------------------------------------------------------------------------------------
     // DATOS PARA INSERTAR DIRECTO
@@ -231,12 +261,13 @@ object ctrlCctrlV {
     // -----------------------------------------------------------------------------------------------------------------
     // MÉTODOS QUE CREAN EL TXT
 
-    // generateDataSquadsTableTXT(contentFile)
+    generateDataSquadsTableTXT(contentFile)
     generateDataPlayersTableTXT(contentFile)
-    // generateDataTournamentsTableTXT(contentFile2)
-    // generateDataStadiumTableTXT(contentFile2)
-    // generateDataMatchesTableTXT(contentFile2)
-    // generateDataTeamsTableTXT(contentFile2, contentFile)
+    generateDataTournamentsTableTXT(contentFile2)
+    generateDataStadiumTableTXT(contentFile2)
+    generateDataMatchesTableTXT(contentFile2)
+    generateDataTeamsTableTXT(contentFile2)
+    generateDataGoalsTableTXT(contentFile2)
 
     // -----------------------------------------------------------------------------------------------------------------
     // MÉTODOS QUE SE CONECTAN DIRECTO CON LA BASE
