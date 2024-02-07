@@ -85,7 +85,7 @@ object ctrlCctrlV {
     def generateDataPlayersTableTXT (data: List[Map[String, String]]): Unit =
       val nombreTXT = "players.txt"
       val insertFormat = s"INSERT INTO players(squadsPlayerId, squadsTournamentId, players_given_name, " +
-        s"players_family_name, players_birth_date, players_female, players_goal_keepere, players_defender, " +
+        s"players_family_name, players_birth_date, players_female, players_goal_keeper, players_defender, " +
         s"players_midfielder, players_forward) VALUES('%s', '%s', '%s', '%s', '%s', %d, %d, %d, %d, %d);"
       val value = data
         .map(x => (x("squads_player_id"),
@@ -163,31 +163,35 @@ object ctrlCctrlV {
         .map(x => escribirDatosTXT(nombreTXT, insertFormat.formatLocal(java.util.Locale.US,
           x._1, x._2, x._3, x._4, x._5, x._6, x._7, x._8, x._9, x._10, x._11, x._12, x._13, x._14, x._15, x._16, x._17)))
 
+    def obtenerlistadeJugadores (data: List[Map[String, String]]) =
+      val listaJugadoresPorEquipo = data
+        .map(x => (x("squads_team_id"), x("squads_player_id")))
+        .groupBy(x => identity(x._1))
+        .map(x => Map(x._1 -> x._2.map(_._2)))
+
+      listaJugadoresPorEquipo
+
+
     def generateDataTeamsTableTXT(data: List[Map[String, String]], dataSP: List[Map[String, String]]): Unit =
       val nombreTXT = "teams.txt"
 
-      val sacarvalores = dataSP
-        .map(x => (x("squads_player_id"), x("squads_tournament_id")))
-        .distinctBy(_._2)
-
-      val insertFormat = s"INSERT INTO teams(squadsPlayerId, squadsTournamentId, home_team_name, " +
+      val insertFormat = s"INSERT INTO teams(squadsTournamentId, home_team_name, " +
         s"away_team_name, home_mens_team, home_womens_team, home_region_name, away_mens_team, " +
-        s"away_womens_team, away_region_name) VALUES('%s', '%s', '%s', '%s', %d, %d, '%s', %d, %d, '%s');"
+        s"away_womens_team, away_region_name) VALUES('%s', '%s', '%s', %d, %d, '%s', %d, %d, '%s');"
       val value = data
-        .map(x => (valoresDoBuedos(x("tournaments_year")).toInt,
-          comillasRaras(x("stadiums_stadium_name")),
-          comillasRaras(x("home_team_name")),
-          comillasRaras(x("home_mens_team")),
-          comillasRaras(x("home_womens_team")),
-          valoresDoBuedos(x("home_region_name")).toInt,
-          valoresDoBuedos(x("away_team_name")).toInt,
-          valoresDoBuedos(x("away_mens_team")).toInt,
-          valoresDoBuedos(x("away_womens_team")).toInt,
-          valoresDoBuedos(x("away_region_name")).toInt))
+        .map(x => (x("matches_tournament_id").trim,
+          comillasRaras(x("home_team_name").trim),
+          comillasRaras(x("away_team_name").trim),
+          valoresDoBuedos(x("home_mens_team").trim).toInt,
+          valoresDoBuedos(x("home_womens_team").trim).toInt,
+          comillasRaras(x("home_region_name").trim),
+          valoresDoBuedos(x("away_mens_team").trim).toInt,
+          valoresDoBuedos(x("away_womens_team").trim).toInt,
+          comillasRaras(x("away_region_name").trim)))
         .distinct
         .sortBy(x => (x._3, x._5))
         .map(x => escribirDatosTXT(nombreTXT, insertFormat.formatLocal(java.util.Locale.US,
-          x._1, x._2, x._3, x._4, x._5, x._6, x._7, x._8, x._9, x._10)))
+          x._1, x._2, x._3, x._4, x._5, x._6, x._7, x._8, x._9)))
 
     // -----------------------------------------------------------------------------------------------------------------
     // DATOS PARA INSERTAR DIRECTO
@@ -220,17 +224,19 @@ object ctrlCctrlV {
       generateDataTourments(contentFile2).debug.as(ExitCode.Success)*/
 
 
+    // obtenerlistadeJugadores(contentFile)
+
 
     // llamar a los métodos
     // -----------------------------------------------------------------------------------------------------------------
     // MÉTODOS QUE CREAN EL TXT
 
     // generateDataSquadsTableTXT(contentFile)
-    // generateDataPlayersTableTXT(contentFile)
+    generateDataPlayersTableTXT(contentFile)
     // generateDataTournamentsTableTXT(contentFile2)
     // generateDataStadiumTableTXT(contentFile2)
     // generateDataMatchesTableTXT(contentFile2)
-    generateDataTeamsTableTXT(contentFile2)
+    // generateDataTeamsTableTXT(contentFile2, contentFile)
 
     // -----------------------------------------------------------------------------------------------------------------
     // MÉTODOS QUE SE CONECTAN DIRECTO CON LA BASE
