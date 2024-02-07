@@ -18,12 +18,12 @@ CREATE TABLE players(
   players_family_name VARCHAR(30) NOT NULL,
   players_birth_date VARCHAR(50) NOT NULL,
   players_female INT NOT NULL,
-  players_goal_keepere VARCHAR(20) NOT NULL,
+  players_goal_keepere INT NOT NULL,
   players_defender INT NOT NULL,
   players_midfielder INT NOT NULL,
   players_forward INT NOT NULL,
-  PRIMARY KEY (players_given_name, players_birth_date),
-  FOREIGN KEY (squadsPlayerId, squadsTournamentId) REFERENCES squads(squads_player_id, squads_tournament_id)
+  FOREIGN KEY (squadsPlayerId, squadsTournamentId) REFERENCES squads(squads_player_id, squads_tournament_id),
+  PRIMARY KEY (players_given_name, players_family_name, squadsTournamentId, squadsPlayerId)
 );
 -- DROP TABLE players;
 
@@ -40,7 +40,7 @@ CREATE TABLE stadiums(
   stadiums_stadium_name VARCHAR(50) NOT NULL, 
   stadiums_city_name VARCHAR(20) NOT NULL,
   stadiums_country_name VARCHAR(20) NOT NULL,
-  stadiums_stadium_capacity VARCHAR(10) NOT NULL,
+  stadiums_stadium_capacity INT NOT NULL,
   PRIMARY KEY (stadiums_stadium_name)
 );
 
@@ -63,7 +63,7 @@ CREATE TABLE matches(
   matches_home_team_score_penalties INT NOT NULL,
   matches_away_team_score_penalties INT NOT NULL,
   matches_result VARCHAR(20) NOT NULL,
-  PRIMARY KEY (matches_tournament_id, matches_match_id),
+  PRIMARY KEY (matches_match_id),
   FOREIGN KEY (tournamentsYear) REFERENCES tournaments(tournaments_year),
   FOREIGN KEY (stadiumsStadiumName) REFERENCES stadiums(stadiums_stadium_name)
 );
@@ -86,12 +86,14 @@ CREATE TABLE teams(
 
 CREATE TABLE goals(
   playersGivenName VARCHAR(30) NOT NULL, 
-  playersBirthDate VARCHAR(50) NOT NULL,  
-  matchesTournamentId VARCHAR(15) NOT NULL, 
+  playersFamilyName VARCHAR(30) NOT NULL,
+  squadsTournamentIdG VARCHAR(15) NOT NULL, 
+  squadsPlayerIdG VARCHAR(15) NOT NULL,
+  matchesMatchId VARCHAR(10) NOT NULL,
   homeTeamName VARCHAR(30) NOT NULL, 
   awayTeamName VARCHAR(30) NOT NULL, 
   tournamentsYear INT NOT NULL, 
-  
+
   goals_goal_id VARCHAR(15) NOT NULL,
   goals_team_id VARCHAR(15) NOT NULL,
   goals_player_id VARCHAR(15) NOT NULL,
@@ -103,8 +105,8 @@ CREATE TABLE goals(
   goals_own_goal INT NOT NULL,
   goals_penalty INT NOT NULL,
   PRIMARY KEY (goals_goal_id),
-  FOREIGN KEY (playersGivenName, playersBirthDate) REFERENCES players(players_given_name, players_birth_date),
-  FOREIGN KEY (matchesTournamentId) REFERENCES matches(matches_tournament_id),
+  FOREIGN KEY (playersGivenName, playersFamilyName, squadsTournamentIdG, squadsPlayerIdG) REFERENCES players(players_given_name, players_family_name, squadsTournamentId, squadsPlayerId),
+  FOREIGN KEY (matchesMatchId) REFERENCES matches(matches_match_id),
   FOREIGN KEY (homeTeamName, awayTeamName) REFERENCES teams(home_team_name, away_team_name),
   FOREIGN KEY (tournamentsYear) REFERENCES tournaments(tournaments_year)
 );
