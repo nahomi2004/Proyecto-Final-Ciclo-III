@@ -68,31 +68,17 @@ object graficas {
         .map(x => Map(x("matches_match_id") -> (valoresDoBuedos(x("matches_home_team_score")) + valoresDoBuedos(x("matches_away_team_score")))))
         .distinct
 
+      val listaPartidos = Series("1" -> 5.0, "2" -> 3.0, "3" -> 3.0, "4" -> 4.0, "5" -> 1.0, "6" -> 3.0,
+        "7" -> 4.0, "8" -> 3.0, "9" -> 1.0, "10" -> 1.0, "11" -> 9.0, "12" -> 4.0,
+        "13" -> 1.0, "14" -> 4.0, "15" -> 4.0, "16" -> 7.0, "17" -> 7.0, "18" -> 6.0)
+
       val logaxis =
-        xyplot(
-          Seq(
-            5.0 -> 1930.1,
-            3.0 -> 1930.2,
-            3.0 -> 1930.3,
-            4.0 -> 1930.4,
-            1.0 -> 1930.5,
-            3.0 -> 1930.6,
-            4.0 -> 1930.7,
-            3.0 -> 1930.8,
-            1.0 -> 1930.9,
-            1.0 -> 1930.10,
-            9.0 -> 1930.11,
-            4.0 -> 1930.12,
-            1.0 -> 1930.13,
-            4.0 -> 1930.14,
-            4.0 -> 1930.15,
-            7.0 -> 1930.16,
-            7.0 -> 1930.17,
-            6.0 -> 1930.18
-          ) -> point()
+        barplotHorizontal(listaPartidos, xLabFontSize = Some(RelFontSize(0.8))
         )(par.withMain(s"${nombre}"))
 
       pngToFile(new File(s"C:/Users/D E L L/Documents/Nahomi/CICLO III/PROYECTO FINAL FINAL FINAL/${nombre}.png"),logaxis.build, 2000)
+
+      sacarValores.foreach(println)
     }
 
     // graficas(contentFile, "PARTIDOS Y GOLES")
